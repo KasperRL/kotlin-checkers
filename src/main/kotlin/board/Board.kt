@@ -24,17 +24,30 @@ class Board {
      * @return void
      */
     fun draw() {
-        for (y in 1..8) {
+        for (y in 0..8) {
+            // print row numbers to the left
+            if (y == 0) {
+                print("  ")
+            } else {
+                print("$y ")
+            }
+
             for (x in 1..8) {
-                // Find the square with the coordinates
-                val square = squares.find { it.position.x == x && it.position.y == y }
-                // Draw piece if the square is occupied, otherwise draw empty square
-                if (square?.isOccupied() == true) {
-                    print("[${square.piece?.color?.name?.first()}]")
-                } else if (square?.color == Color.BLACK) {
-                    print("[ ]")
+                // print column numbers on the first row
+                if (y == 0) {
+                    print(" $x ")
+                    continue
                 } else {
-                    print("[#]")
+                    // Find the square with the coordinates
+                    val square = squares.find { it.position.x == x && it.position.y == y }
+                    // Draw piece if the square is occupied, otherwise draw empty square
+                    if (square?.isOccupied() == true) {
+                        print("[${square.piece?.color?.name?.first()}]")
+                    } else if (square?.color == Color.BLACK) {
+                        print("[ ]")
+                    } else {
+                        print("[#]")
+                    }
                 }
             }
             println()
