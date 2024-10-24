@@ -4,18 +4,15 @@ import org.example.enums.Color
 import org.example.piece.Piece
 import org.example.util.Position
 
+/**
+ * Board class represents a checkers board with 8x8 squares
+ * Squares are represented by a list of Square objects
+ * Pieces are placed on the board by placing them on the squares
+ * @see Square
+ */
 class Board {
-    private val squares = createSquares()
 
-    /**
-     * Place a piece on the board
-     * @param piece Piece
-     * @return void
-     */
-    fun placePiece(piece: Piece) {
-        val square = squares.find { it.position == piece.position }
-        square?.piece = piece
-    }
+    private val squares = createSquares()
 
     /**
      * Draw a board with 8x8 squares and pieces
@@ -33,12 +30,11 @@ class Board {
             }
 
             for (x in 1..8) {
-                // print column numbers on the first row
+                // print column numbers on the first row (at the top)
                 if (y == 0) {
                     print(" $x ")
                     continue
                 } else {
-                    // Find the square with the coordinates
                     val square = squares.find { it.position.x == x && it.position.y == y }
                     // Draw piece if the square is occupied, otherwise draw empty square
                     if (square?.isOccupied() == true) {
@@ -70,6 +66,16 @@ class Board {
         }
 
         return squares
+    }
+
+    /**
+     * Place a piece on the board
+     * @param piece Piece to be placed
+     * @return void
+     */
+    fun placePiece(piece: Piece) {
+        val square = squares.find { it.position == piece.position }
+        square?.piece = piece
     }
 
 }

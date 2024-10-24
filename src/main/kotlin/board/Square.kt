@@ -17,6 +17,10 @@ data class Square(
     var piece: Piece? = null
 ) {
 
+    /**
+     * Check if the square is occupied by a piece
+     * @return Boolean
+     */
     fun isOccupied(): Boolean {
         return piece != null
     }

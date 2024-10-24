@@ -4,9 +4,18 @@ import org.example.board.Board
 import org.example.board.Square
 import org.example.enums.Color
 import org.example.piece.Piece
+import org.example.player.Player
 import org.example.util.Position
 
+/**
+ * Game class represents a checkers game
+ * It creates a board and places initial pieces on it
+ * @see Board
+ * @see Piece
+ */
 class Game {
+
+    val players = createPlayers()
 
     /**
      * Start the game
@@ -47,6 +56,39 @@ class Game {
         }
 
         return pieces
+    }
+
+    /**
+     * Interactively create the players
+     * @return List<Player>
+     */
+    fun createPlayers(): List<Player> {
+        val players = mutableListOf<Player>()
+        for (i in 1..2) {
+            print("Player $i, enter your name: ")
+            val name = readln()
+
+            // just the first player gets to choose a color
+            val color: Color
+            if (i == 1) {
+                print("$name, enter your color (black/white): ")
+                color = when (readln().lowercase()) {
+                    "black" -> Color.BLACK
+                    "white" -> Color.WHITE
+                    else -> Color.WHITE // default to white if invalid input
+                }
+            } else {
+                // player 2 gets the opposite color of player 1
+                color = when (players[0].color) {
+                    Color.BLACK -> Color.WHITE
+                    Color.WHITE -> Color.BLACK
+                }
+            }
+
+            players.add(Player(name, color))
+        }
+
+        return players
     }
 
 }
