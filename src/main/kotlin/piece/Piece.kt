@@ -12,6 +12,6 @@ import org.example.util.Position
  */
 data class Piece(
     val color: Color,
-    val position: Position,
+    var position: Position,
     val isKing: Boolean = false
 )

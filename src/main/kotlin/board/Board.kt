@@ -35,7 +35,7 @@ class Board {
                     print(" $x ")
                     continue
                 } else {
-                    val square = squares.find { it.position.x == x && it.position.y == y }
+                    val square = getSquare(Position(x, y))
                     // Draw piece if the square is occupied, otherwise draw empty square
                     if (square?.isOccupied() == true) {
                         print("[${square.piece?.color?.name?.first()}]")
@@ -69,13 +69,44 @@ class Board {
     }
 
     /**
+     * Get a square by its position
+     * @param position Position of the square
+     * @return Square?
+     */
+    fun getSquare(position: Position): Square? {
+        return squares.find { it.position == position }
+    }
+
+    /**
+     * Get a square by the piece on it
+     * @param piece Piece to find the square for
+     * @return Square?
+     */
+    fun getSquare(piece: Piece): Square? {
+        return squares.find { it.piece == piece }
+    }
+
+    /**
      * Place a piece on the board
      * @param piece Piece to be placed
      * @return void
      */
     fun placePiece(piece: Piece) {
-        val square = squares.find { it.position == piece.position }
+        val square = getSquare(piece.position)
         square?.piece = piece
+    }
+
+    /**
+     * Move a piece from one square to another
+     * @param piece Piece to move
+     * @param square Destination square
+     * @return void
+     */
+    fun movePiece(piece: Piece, square: Square) {
+        val currentSquare = getSquare(piece)
+        currentSquare?.piece = null
+        square.piece = piece
+        piece.position = square.position
     }
 
 }

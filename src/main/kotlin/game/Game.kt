@@ -16,17 +16,22 @@ import org.example.util.Position
 class Game {
 
     val players = createPlayers()
+    val board = Board()
+    val pieces = createInitialPieces()
+    var currentPlayerIndex = 0
 
     /**
      * Start the game
+     * Place initial pieces on the board and start the main game loop
      * @return void
      */
     fun start() {
-        val board = Board()
-        val pieces = createInitialPieces()
-
         pieces.forEach { board.placePiece(it) }
         board.draw()
+
+        while (!isGameOver()) {
+            playTurn()
+        }
     }
 
     /**
@@ -62,7 +67,7 @@ class Game {
      * Interactively create the players
      * @return List<Player>
      */
-    fun createPlayers(): List<Player> {
+    private fun createPlayers(): List<Player> {
         val players = mutableListOf<Player>()
         for (i in 1..2) {
             print("Player $i, enter your name: ")
@@ -89,6 +94,86 @@ class Game {
         }
 
         return players
+    }
+
+    /**
+     * Check if the game is over
+     * @return Boolean
+     */
+    fun isGameOver(): Boolean {
+        return false
+    }
+
+    /**
+     * Play a turn for the current player
+     * @return void
+     */
+    private fun playTurn() {
+        val currentPlayer = players[currentPlayerIndex]
+        println("${currentPlayer.name}'s turn (${currentPlayer.color})")
+
+        val piece = selectPiece() ?: return
+        val square = selectSquare() ?: return
+
+        board.movePiece(piece, square)
+        board.draw()
+        switchPlayer()
+    }
+
+    /**
+     * Prompt the user to select a piece to move
+     * @return Piece?
+     */
+    private fun selectPiece(): Piece? {
+        print("Enter the coordinates of the piece to move (x,y): ")
+
+        return try {
+            val coordinates = readln()
+            val (x, y) = coordinates.split(",").map { it.trim().toInt() } // split input to x and y
+            val piece = pieces.find { it.position == Position(x, y) }
+
+            if (piece == null) {
+                println("No piece found at $x, $y")
+                null // return null to prompt the user to select a piece again
+            } else {
+                piece
+            }
+        } catch (_: Exception) {
+            println("Invalid input. Please enter the coordinates in the format x,y")
+            null
+        }
+    }
+
+    /**
+     * Prompt the user to select a square to move to
+     * @return Square?
+     */
+    private fun selectSquare(): Square? {
+        print("Enter the coordinates of the square to move to (x,y): ")
+
+        return try {
+            val destCoordinates = readln()
+            val (destX, destY) = destCoordinates.split(",").map { it.trim().toInt() } // split input to x and y
+            val square = board.getSquare(Position(destX, destY))
+
+            if (square == null) {
+                println("No square found at $destX, $destY")
+                null // return null to prompt the user to select a square again
+            } else {
+                square
+            }
+        } catch (_: Exception) {
+            println("Invalid input. Please enter the coordinates in the format x,y")
+            null
+        }
+    }
+
+    /**
+     * Switch the current player
+     * @return void
+     */
+    private fun switchPlayer() {
+        currentPlayerIndex = if (currentPlayerIndex == 0) 1 else 0
     }
 
 }
