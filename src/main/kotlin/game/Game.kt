@@ -42,7 +42,7 @@ class Game {
     private fun createInitialPieces(): List<Piece> {
         val pieces = mutableListOf<Piece>()
 
-        // Place black pieces on rows 1-3
+        // place black pieces on rows 1-3
         for (y in 1..3) {
             for (x in 1..8 step 2) {
                 // add 1 to x if y is even to match the board's alternating pattern
@@ -51,7 +51,7 @@ class Game {
             }
         }
 
-        // Place white pieces on rows 6-8
+        // place white pieces on rows 6-8
         for (y in 6..8) {
             for (x in 1..8 step 2) {
                 // add 1 to x if y is even to match the board's alternating pattern
@@ -111,9 +111,19 @@ class Game {
     private fun playTurn() {
         val currentPlayer = players[currentPlayerIndex]
         println("${currentPlayer.name}'s turn (${currentPlayer.color})")
+        val validator = Validator()
 
         val piece = selectPiece() ?: return
+        if (!validator.pieceBelongsToPlayer(piece, currentPlayer)) {
+            println("That piece doesn't belong to you")
+            return
+        }
+
         val square = selectSquare() ?: return
+        if (!validator.isValidMove(piece, square)) {
+            println("The piece can't move to that square")
+            return
+        }
 
         board.movePiece(piece, square)
         board.draw()
