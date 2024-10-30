@@ -13,6 +13,7 @@ import org.example.util.Position
 class Board {
 
     private val squares = createSquares()
+    private val pieces = createInitialPieces()
 
     /**
      * Draw a board with 8x8 squares and pieces
@@ -21,6 +22,8 @@ class Board {
      * @return void
      */
     fun draw() {
+        pieces.forEach { placePiece(it) }
+
         for (y in 0..8) {
             // print row numbers to the left
             if (y == 0) {
@@ -66,6 +69,35 @@ class Board {
         }
 
         return squares
+    }
+
+    /**
+     * Create initial pieces for both sides
+     * Black pieces on rows 1-3, white pieces on rows 6-8
+     * @return List<Piece>
+     */
+    private fun createInitialPieces(): List<Piece> {
+        val pieces = mutableListOf<Piece>()
+
+        // place black pieces on rows 1-3
+        for (y in 1..3) {
+            for (x in 1..8 step 2) {
+                // add 1 to x if y is even to match the board's alternating pattern
+                val position = Position(if (y % 2 == 0) x + 1 else x, y)
+                pieces.add(Piece(Color.BLACK, position))
+            }
+        }
+
+        // place white pieces on rows 6-8
+        for (y in 6..8) {
+            for (x in 1..8 step 2) {
+                // add 1 to x if y is even to match the board's alternating pattern
+                val position = Position(if (y % 2 == 0) x + 1 else x, y)
+                pieces.add(Piece(Color.WHITE, position))
+            }
+        }
+
+        return pieces
     }
 
     /**
