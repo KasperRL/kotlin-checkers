@@ -17,7 +17,7 @@ class Game {
 
     val players = createPlayers()
     val board = Board()
-    var currentPlayerIndex = 0
+    var currentPlayerIndex = players.indexOf(players.first { it.color == Color.WHITE })
 
     /**
      * Start the game
@@ -30,6 +30,10 @@ class Game {
         while (!isGameOver()) {
             playTurn()
         }
+
+        switchPlayer()
+        val winner = players[currentPlayerIndex]
+        println("${winner.name} wins!")
     }
 
     /**
@@ -70,7 +74,7 @@ class Game {
      * @return Boolean
      */
     fun isGameOver(): Boolean {
-        return false
+        return board.getPieces(Color.BLACK).isEmpty() || board.getPieces(Color.WHITE).isEmpty()
     }
 
     /**
