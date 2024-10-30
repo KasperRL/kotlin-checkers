@@ -6,7 +6,6 @@ import org.example.enums.Color
 import org.example.piece.Piece
 import org.example.player.Player
 import org.example.util.Position
-import kotlin.math.abs
 
 /**
  * Game class represents a checkers game
@@ -32,7 +31,6 @@ class Game {
             playTurn()
         }
     }
-
 
     /**
      * Interactively create the players
@@ -91,35 +89,30 @@ class Game {
         }
 
         val square = selectSquare() ?: return
-
         val move = Move(piece, square.position)
-        if (isCaptureMove(move)) {
+
+        // if any pieces can capture, the player must capture
+        val availableCaptures = board.getPieces(currentPlayer.color).flatMap { availableCaptures(it) }
+        if (availableCaptures.isNotEmpty() && !move.isCapture()) {
+            println("You must capture a piece. Available jump moves: $availableCaptures")
+            return
+        }
+
+        if (move.isCapture()) { // handle capture moves
             move.capturedPiece = getCapturedPiece(piece, square.position, currentPlayer.color)
             if (!validator.isValidCapture(move)) {
                 println("The piece can't move to that square")
                 return
             }
-        } else if (!validator.isValidMove(move)) {
+        } else if (!validator.isValidMove(move)) { // handle regular moves
             println("The piece can't move to that square")
             return
         }
 
-        move.capturedPiece?.let { board.removePiece(it) } // remove the captured piece if it exists
+        move.capturedPiece?.let { board.removePiece(it) }
         board.movePiece(piece, square)
         board.draw()
         switchPlayer()
-    }
-
-    /**
-     * Check if the move is a capture move
-     * A move is a capture move when the step is 2 instead of 1 (a jump)
-     * @param move Move
-     * @return Boolean
-     */
-    private fun isCaptureMove(move: Move): Boolean {
-        val stepX = abs(move.to.x - move.piece.position.x)
-        val stepY = abs(move.to.y - move.piece.position.y)
-        return stepX == 2 && stepY == 2
     }
 
     /**
@@ -141,6 +134,37 @@ class Game {
     }
 
     /**
+     * Get available captures for a piece.
+     * A piece can capture another piece if it's diagonal to it and the square after is empty.
+     * @param piece Piece
+     * @return List<Move>
+     */
+    private fun availableCaptures(piece: Piece): List<Move> {
+        val availableCaptures = mutableListOf<Move>()
+        val direction = if (piece.color == Color.BLACK) 1 else -1 // black pieces move down, white pieces move up
+
+        val diagonalPieces = listOf(
+            board.getPiece(Position(piece.position.x + 1, piece.position.y + direction)),
+            board.getPiece(Position(piece.position.x - 1, piece.position.y + direction))
+        )
+
+        diagonalPieces.forEach {
+            if (it != null && it.color != piece.color) {
+                // destination square is calculated by moving 2 squares in the same direction
+                val destX = piece.position.x + 2 * (it.position.x - piece.position.x)
+                val destY = piece.position.y + 2 * (it.position.y - piece.position.y)
+                val destSquare = board.getSquare(Position(destX, destY))
+
+                if (destSquare != null && !destSquare.isOccupied()) {
+                    availableCaptures.add(Move(piece, destSquare.position, it))
+                }
+            }
+        }
+
+        return availableCaptures
+    }
+
+    /**
      * Prompt the user to select a piece to move
      * @return Piece?
      */
@@ -152,7 +176,7 @@ class Game {
             val (x, y) = coordinates.split(",").map { it.trim().toInt() } // split input to x and y
             val piece = board.getPiece(Position(x, y))
 
-            if (piece == null || piece.isCaptured) {
+            if (piece == null) {
                 println("No piece found at $x, $y")
                 null // return null to prompt the user to select a piece again
             } else {

@@ -20,16 +20,21 @@ class Validator(val board: Board) {
      * @return Boolean
      */
     fun isValidMove(move: Move): Boolean {
-        // depending on the color, the piece can either only move up or only move down
-        return if (move.piece.color == Color.WHITE) {
-            move.to.y == move.piece.position.y - 1 // destination is in front of the piece
-                    && (move.piece.position.x + 1 == move.to.x || move.piece.position.x - 1 == move.to.x) // destination is diagonal to the piece
-        } else {
-            move.to.y == move.piece.position.y + 1
-                    && (move.piece.position.x + 1 == move.to.x || move.piece.position.x - 1 == move.to.x)
+        val offsetX = move.to.x - move.piece.position.x
+        val offsetY = move.to.y - move.piece.position.y
+
+        return when (move.piece.color) {
+            Color.WHITE -> offsetY == -1 && (offsetX == 1 || offsetX == -1)
+            Color.BLACK -> offsetY == 1 && (offsetX == 1 || offsetX == -1)
         }
     }
 
+    /**
+     * Check if the move is a valid capture move
+     * A capture move is valid if the destination is two squares away from the piece and the square in between is occupied
+     * @param move Move
+     * @return Boolean
+     */
     fun isValidCapture(move: Move): Boolean {
         val targetSquare = board.getSquare(move.to) ?: return false
         return !targetSquare.isOccupied() && move.capturedPiece != null

@@ -13,7 +13,7 @@ import org.example.util.Position
 class Board {
 
     private val squares = createSquares()
-    private val pieces = createInitialPieces()
+    private var pieces = createInitialPieces()
 
     /**
      * Draw a board with 8x8 squares and pieces
@@ -76,7 +76,7 @@ class Board {
      * Black pieces on rows 1-3, white pieces on rows 6-8
      * @return List<Piece>
      */
-    private fun createInitialPieces(): List<Piece> {
+    private fun createInitialPieces(): MutableList<Piece> {
         val pieces = mutableListOf<Piece>()
 
         // place black pieces on rows 1-3
@@ -128,6 +128,15 @@ class Board {
     }
 
     /**
+     * Get all pieces of a specific color
+     * @param color Color of the pieces
+     * @return List<Piece>
+     */
+    fun getPieces(color: Color): List<Piece> {
+        return pieces.filter { it.color == color }
+    }
+
+    /**
      * Place a piece on the board
      * @param piece Piece to be placed
      * @return void
@@ -156,8 +165,9 @@ class Board {
      * @return void
      */
     fun removePiece(piece: Piece) {
-        piece.isCaptured = true
-        getSquare(piece)?.piece = null
+        val square = getSquare(piece)
+        square?.piece = null
+        pieces.remove(piece)
     }
 
 }
