@@ -39,7 +39,6 @@ class Board {
                     continue
                 } else {
                     val square = getSquare(Position(x, y))
-                    // Draw piece if the square is occupied, otherwise draw empty square
                     if (square?.isOccupied() == true) {
                         print("[${square.piece?.color?.name?.first()}]")
                     } else if (square?.color == Color.BLACK) {

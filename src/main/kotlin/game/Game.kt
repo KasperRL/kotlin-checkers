@@ -46,7 +46,7 @@ class Game {
             print("Player $i, enter your name: ")
             val name = readln()
 
-            // just the first player gets to choose a color
+            // the first player gets to choose their color
             val color: Color
             if (i == 1) {
                 print("$name, enter your color (black/white): ")
@@ -102,13 +102,13 @@ class Game {
             return
         }
 
-        if (move.isCapture()) { // handle capture moves
+        if (move.isCapture()) {
             move.capturedPiece = getCapturedPiece(piece, square.position, currentPlayer.color)
             if (!validator.isValidCapture(move)) {
                 println("The piece can't move to that square")
                 return
             }
-        } else if (!validator.isValidMove(move)) { // handle regular moves
+        } else if (!validator.isValidMove(move)) {
             println("The piece can't move to that square")
             return
         }
@@ -128,7 +128,7 @@ class Game {
      * @return Piece?
      */
     private fun getCapturedPiece(piece: Piece, destination: Position, playerColor: Color): Piece? {
-        val captureX = (piece.position.x + destination.x) / 2 // get the middle x coordinate
+        val captureX = (piece.position.x + destination.x) / 2 // get the captured piece's x
         val captureY = if (playerColor == Color.BLACK) {
             piece.position.y + 1 // capture piece is below the player's piece
         } else {
@@ -147,6 +147,7 @@ class Game {
         val availableCaptures = mutableListOf<Move>()
         val direction = if (piece.color == Color.BLACK) 1 else -1 // black pieces move down, white pieces move up
 
+        // get the pieces on the diagonal squares if any
         val diagonalPieces = listOf(
             board.getPiece(Position(piece.position.x + 1, piece.position.y + direction)),
             board.getPiece(Position(piece.position.x - 1, piece.position.y + direction))
@@ -154,7 +155,7 @@ class Game {
 
         diagonalPieces.forEach {
             if (it != null && it.color != piece.color) {
-                // destination square is calculated by moving 2 squares in the same direction
+                // get the square after the piece (destination square)
                 val destX = piece.position.x + 2 * (it.position.x - piece.position.x)
                 val destY = piece.position.y + 2 * (it.position.y - piece.position.y)
                 val destSquare = board.getSquare(Position(destX, destY))
