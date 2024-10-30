@@ -6,6 +6,7 @@ import org.example.enums.Color
 import org.example.piece.Piece
 import org.example.player.Player
 import org.example.util.Position
+import kotlin.math.abs
 
 /**
  * Game class represents a checkers game
@@ -111,7 +112,7 @@ class Game {
     private fun playTurn() {
         val currentPlayer = players[currentPlayerIndex]
         println("${currentPlayer.name}'s turn (${currentPlayer.color})")
-        val validator = Validator()
+        val validator = Validator(board)
 
         val piece = selectPiece() ?: return
         if (!validator.pieceBelongsToPlayer(piece, currentPlayer)) {
@@ -120,14 +121,53 @@ class Game {
         }
 
         val square = selectSquare() ?: return
-        if (!validator.isValidMove(piece, square)) {
+
+        val move = Move(piece, square.position)
+        if (isCaptureMove(move)) {
+            move.capturedPiece = getCapturedPiece(piece, square.position, currentPlayer.color)
+            if (!validator.isValidCapture(move)) {
+                println("The piece can't move to that square")
+                return
+            }
+        } else if (!validator.isValidMove(move)) {
             println("The piece can't move to that square")
             return
         }
 
+        move.capturedPiece?.let { board.removePiece(it) } // remove the captured piece if it exists
         board.movePiece(piece, square)
         board.draw()
         switchPlayer()
+    }
+
+    /**
+     * Check if the move is a capture move
+     * A move is a capture move when the step is 2 instead of 1 (a jump)
+     * @param move Move
+     * @return Boolean
+     */
+    private fun isCaptureMove(move: Move): Boolean {
+        val stepX = abs(move.to.x - move.piece.position.x)
+        val stepY = abs(move.to.y - move.piece.position.y)
+        return stepX == 2 && stepY == 2
+    }
+
+    /**
+     * Get the captured piece
+     * The piece is retrieved by getting the piece diagonal to the players piece
+     * @param piece Piece
+     * @param destination Position
+     * @param playerColor Color
+     * @return Piece?
+     */
+    private fun getCapturedPiece(piece: Piece, destination: Position, playerColor: Color): Piece? {
+        val captureX = (piece.position.x + destination.x) / 2 // get the middle x coordinate
+        val captureY = if (playerColor == Color.BLACK) {
+            piece.position.y + 1 // capture piece is below the player's piece
+        } else {
+            piece.position.y - 1 // capture piece is above the player's piece
+        }
+        return board.getPiece(Position(captureX, captureY))
     }
 
     /**
@@ -142,7 +182,7 @@ class Game {
             val (x, y) = coordinates.split(",").map { it.trim().toInt() } // split input to x and y
             val piece = pieces.find { it.position == Position(x, y) }
 
-            if (piece == null) {
+            if (piece == null || piece.isCaptured) {
                 println("No piece found at $x, $y")
                 null // return null to prompt the user to select a piece again
             } else {

@@ -87,6 +87,15 @@ class Board {
     }
 
     /**
+     * Get a piece by its position
+     * @param position Position of the piece
+     * @return Piece?
+     */
+    fun getPiece(position: Position): Piece? {
+        return getSquare(position)?.piece
+    }
+
+    /**
      * Place a piece on the board
      * @param piece Piece to be placed
      * @return void
@@ -107,6 +116,16 @@ class Board {
         currentSquare?.piece = null
         square.piece = piece
         piece.position = square.position
+    }
+
+    /**
+     * Remove a piece from the board
+     * @param piece Piece
+     * @return void
+     */
+    fun removePiece(piece: Piece) {
+        piece.isCaptured = true
+        getSquare(piece)?.piece = null
     }
 
 }
