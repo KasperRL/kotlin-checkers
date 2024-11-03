@@ -9,7 +9,7 @@ import org.example.util.Position
 
 /**
  * Game class represents a checkers game
- * It creates a board and places initial pieces on it
+ * It creates a board and manages the overall game state
  * @see Board
  * @see Piece
  */
@@ -21,7 +21,6 @@ class Game {
 
     /**
      * Start the game
-     * Place initial pieces on the board and start the main game loop
      * @return void
      */
     fun start() {
