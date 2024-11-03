@@ -134,6 +134,7 @@ class Game {
         } else {
             piece.position.y - 1 // capture piece is above the player's piece
         }
+
         return board.getPiece(Position(captureX, captureY))
     }
 
